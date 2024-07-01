@@ -25,7 +25,7 @@ class BookList extends Component {
                     <Col md={8}>
                         <Row>
                             {books.map((book) => (
-                                <Col md={4} key={book.asin}>
+                                <Col md={6} key={book.asin}>
                                     <SingleBook
                                         book={book}
                                         isSelected={selectedAsin === book.asin}
