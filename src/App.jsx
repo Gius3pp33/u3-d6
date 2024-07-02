@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useState } from "react";
+import React, { Component } from "react";
 import MyNav from "./components/MyNav";
 import MyFooter from "./components/MyFooter";
 import Welcome from "./components/Welcome";
@@ -20,24 +20,27 @@ const genres = {
   Scifi: scifiBooks,
 };
 
-const App = () => {
-  const [selectedGenre, setSelectedGenre] = useState("Fantasy");
-
-  const handleSelectGenre = (genre) => {
-    setSelectedGenre(genre);
+class App extends Component {
+  state = {
+    selectedGenre: "Fantasy",
   };
 
-  return (
-    <div>
-      <MyNav genres={genres} onSelectGenre={handleSelectGenre} />
+  handleSelectGenre = (genre) => {
+    this.setState({ selectedGenre: genre });
+  };
 
-      <Container className="mt-5">
-        <Welcome />
-        <BookList books={genres[selectedGenre]} />
-      </Container>
-      <MyFooter />
-    </div>
-  );
-};
+  render() {
+    return (
+      <div>
+        <MyNav genres={genres} onSelectGenre={this.handleSelectGenre} />
+        <Container className="mt-5">
+          <Welcome />
+          <BookList books={genres[this.state.selectedGenre]} />
+        </Container>
+        <MyFooter />
+      </div>
+    );
+  }
+}
 
 export default App;
