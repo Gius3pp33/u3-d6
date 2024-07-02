@@ -8,7 +8,7 @@ const SingleBook = ({ book, isSelected, onSelect }) => {
 
     return (
         <Card
-            className={`book-card mb-4 ${isSelected ? 'selected' : ''}`}
+            className={`book-card  mb-4 ${isSelected ? 'selected' : ''}`}
             onClick={handleClick}
             style={{
                 transition: 'all 0.3s ease',

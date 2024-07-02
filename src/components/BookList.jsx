@@ -35,7 +35,7 @@ class BookList extends Component {
                             ))}
                         </Row>
                     </Col>
-                    <Col md={4}>
+                    <Col md={4} style={{ position: 'sticky', top: '0', height: '100vh', overflowY: 'auto' }}>
                         {selectedAsin && <CommentArea asin={selectedAsin} />}  {/* Passaggio di selectedAsin cioè della prop */}
                     </Col>
                 </Row>
