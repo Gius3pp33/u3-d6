@@ -1,41 +1,30 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddComment from './AddComment';
 import Error from './Error';
 import Loading from './Loading';
 import CommentList from './CommentList';
 import { Alert } from 'react-bootstrap';
 
-class CommentArea extends Component {
-    state = {
-        comments: [],
-        loading: false,
-        error: null,
-    };
+const CommentArea = ({ asin }) => {
+    const [comments, setComments] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    componentDidMount() {
-        const { asin } = this.props;
+    // Effettua la fetch dei commenti ogni volta che asin cambia
+    useEffect(() => {
         if (asin) {
-            this.fetchComments();
+            fetchComments();
         }
-    }
+    }, [asin]);
 
-    componentDidUpdate(prevProps) {
-        if (this.props.asin !== prevProps.asin) {
-            console.log('Nuovo asin ricevuto:', this.props.asin);
-            if (this.props.asin) {
-                this.fetchComments();
-            } else {
-                this.setState({ comments: [], loading: false });
-            }
-        }
-    }
-
-    fetchComments = async () => {
-        const { asin } = this.props;
+    const fetchComments = async () => {
         const url = `https://striveschool-api.herokuapp.com/api/comments/${asin}`;
+        setLoading(true);
+        setError(null);
+
+        console.log('Inizio fetch dei commenti'); 
 
         try {
-            this.setState({ loading: true, error: null });
             const response = await fetch(url, {
                 headers: {
                     'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjgyOWMzOTJiNjYwYzAwMTUzZDhkYzkiLCJpYXQiOjE3MTk4MzU3MDUsImV4cCI6MTcyMTA0NTMwNX0.85A3dHcNjFbc4sL9LZjkz3-dgdqtBPDeaShJCQ-AVss"
@@ -43,24 +32,32 @@ class CommentArea extends Component {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch comments');
+                throw new Error('Errore');
             }
 
             const data = await response.json();
-            this.setState({ comments: data, loading: false });
+            console.log('Commenti ricevuti:', data); 
+            setComments(data);
         } catch (error) {
-            console.error('Error fetching comments:', error.message);
-            this.setState({ loading: false, error: 'Failed to fetch comments. Please try again later.' });
+            console.log('Errore durante la fetch dei commenti:', error.message); 
+            setError('Errore durante la fetch dei commenti,riprova più tardi.');
+        } finally {
+            console.log('Fetch dei commenti completata'); 
+            setLoading(false);
         }
     };
 
-    refreshComments = () => {
-        this.fetchComments();
+    // Funzione di resfresh per i commenti
+    const refreshComments = () => {
+        console.log('refresh of the comments'); // Log in italiano
+        fetchComments();
     };
 
-    handleDeleteComment = async (commentId) => {
-        const { asin } = this.props;
-        const url = `https://striveschool-api.herokuapp.com/api/comments/${commentId}?asin=${asin}`;
+    // Funzione per eliminare un commento
+    const handleDeleteComment = async (commentId) => {
+        const url = `https://striveschool-api.herokuapp.com/api/comments/${commentId}`;
+
+        console.log(`Cancellazione del commento con id: ${commentId}`);
 
         try {
             const response = await fetch(url, {
@@ -71,43 +68,41 @@ class CommentArea extends Component {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to delete comment');
+                throw new Error('Cancellazione dei commenti non riuscita');
             }
 
-            this.setState((prevState) => ({
-                comments: prevState.comments.filter(comment => comment._id !== commentId),
-            }));
+            console.log(`Commento con id: ${commentId} eliminato`);
+            setComments(prevComments => prevComments.filter(comment => comment._id !== commentId));
         } catch (error) {
-            console.error('Error deleting comment:', error.message);
-            this.setState({ error: 'Failed to delete comment. Please try again later.' });
+            console.log('Errore durante l\'eliminazione del commento:', error.message); 
+            setError('Errore durante l\'eliminazione del commento,riprova più tardi.');
         }
     };
 
-    render() {
-        const { comments, loading, error } = this.state;
-        const { asin } = this.props;
-
-        if (!asin) {
-            return <Alert>No elementId (asin) provided.</Alert>;
-        }
-
-        if (loading) {
-            return <Loading />;
-        }
-
-        if (error) {
-            return <Error message={error} />;
-        }
-
-        return (
-            <div className="comment-area">
-                <h3>Comments</h3>
-                {comments.length === 0 && <Alert>Nessun commento disponibile.</Alert>}
-                <CommentList comments={comments} onDelete={this.handleDeleteComment} />
-                <AddComment asin={asin} refreshComments={this.refreshComments} />
-            </div>
-        );
+    // Ritorna un alert se asin non è fornito
+    if (!asin) {
+        return <Alert>No elementId (asin) provided.</Alert>;
     }
-}
+
+    // Mostra il componente di loading durante il fetch
+    if (loading) {
+        return <Loading />;
+    }
+
+    // Mostra un componente di errore se c'è un problema
+    if (error) {
+        return <Error message={error} />;
+    }
+
+    // Ritorna la lista dei commenti e il form per aggiungere nuovi commenti
+    return (
+        <div className="comment-area">
+            <h3>Comments</h3>
+            {comments.length === 0 && <Alert>Nessun commento disponibile.</Alert>}
+            <CommentList comments={comments} onDelete={handleDeleteComment} />
+            <AddComment asin={asin} refreshComments={refreshComments} />
+        </div>
+    );
+};
 
 export default CommentArea;

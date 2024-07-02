@@ -1,30 +1,32 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 
-class AddComment extends Component {
-    state = {
+const AddComment = ({ asin, refreshComments }) => {
+      // Stato del form per tenere traccia del commento e del rate
+    const [formState, setFormState] = useState({
         comment: '',
         rate: 1,
-    };
-
-    handleInputChange = (e) => {
+    });
+      // gestisce gli eventi per aggiornare lo stato del form quando l'utente inserisce dati
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
-        this.setState({
+        setFormState((prevState) => ({
+            ...prevState,
             [name]: value,
-        });
+        }));
     };
-
-    handleSubmit = async (e) => {
+       // Gestisce gli eventi per l'invio del form
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const { comment, rate } = this.state;
-        const { asin, refreshComments } = this.props;
+        const { comment, rate } = formState;
         const url = 'https://striveschool-api.herokuapp.com/api/comments/';
         const newComment = {
             comment,
             rate,
             elementId: asin,
         };
-        console.log('New comment:', newComment); // Verifica il contenuto di newComment prima di inviarlo
+        console.log('Nuovo commento:', newComment); 
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -36,56 +38,54 @@ class AddComment extends Component {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to add comment');
+                throw new Error('Commento non riuscito');
             }
 
-            refreshComments();
-            this.setState({
+            refreshComments(); // refresh dei commenti dopo l'aggiunta di un commento
+            setFormState({
                 comment: '',
                 rate: 1,
-            });
+            }); 
         } catch (error) {
-            console.log('Error adding comment:', error.message);
+            console.log('Errore nell\'aggiungere il commento:', error.message);
         }
     };
 
-    render() {
-        const { comment, rate } = this.state;
+    const { comment, rate } = formState; // destrutturazione dello stato del form
 
-        return (
-            <Form onSubmit={this.handleSubmit}>
-                <Form.Group controlId="comment">
-                    <Form.Label>Comment</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="comment"
-                        value={comment}
-                        onChange={this.handleInputChange}
-                        required
-                    />
-                </Form.Group>
-                <Form.Group controlId="rate">
-                    <Form.Label>Rate</Form.Label>
-                    <Form.Control
-                        as="select"
-                        name="rate"
-                        value={rate}
-                        onChange={this.handleInputChange}
-                        required
-                    >
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </Form.Control>
-                </Form.Group>
-                <Button variant="primary" className='mt-2'size='sm' type="submit">
-                    Add Comment
-                </Button>
-            </Form>
-        );
-    }
-}
+    return (
+        <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="comment">
+                <Form.Label>Comment</Form.Label>
+                <Form.Control
+                    type="text"
+                    name="comment"
+                    value={comment}
+                    onChange={handleInputChange}
+                    required
+                />
+            </Form.Group>
+            <Form.Group controlId="rate">
+                <Form.Label>Rate</Form.Label>
+                <Form.Control
+                    as="select"
+                    name="rate"
+                    value={rate}
+                    onChange={handleInputChange}
+                    required
+                >
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </Form.Control>
+            </Form.Group>
+            <Button variant="primary" className='mt-2' size='sm' type="submit">
+                Add Comment
+            </Button>
+        </Form>
+    );
+};
 
 export default AddComment;
