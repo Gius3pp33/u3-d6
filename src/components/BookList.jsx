@@ -12,14 +12,15 @@ const BookList = ({ books }) => {
         console.log(`Selezionato il libro con asin: ${asin}`);
         setSelectedAsin((prevSelectedAsin) => (prevSelectedAsin === asin ? null : asin));
     };
-     // filtra i libri in base alla query di ricerca
+
+    // filtra i libri in base alla query di ricerca
     const filteredBooks = books.filter((book) =>
         book.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
     console.log('libri filtrati:', filteredBooks); // Log dei libri filtrati
 
     return (
-        <Container>
+        <Container >
             <Form.Group className="mb-4">
                 <Form.Control
                     type="text"
@@ -37,6 +38,7 @@ const BookList = ({ books }) => {
                                     book={book}
                                     isSelected={selectedAsin === book.asin}
                                     onSelect={handleBookSelect}
+                                    data-testid="book-card"
                                 />
                             </Col>
                         ))}

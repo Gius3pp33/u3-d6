@@ -8,12 +8,14 @@ const SingleBook = ({ book, isSelected, onSelect }) => {
 
     return (
         <Card
-            className={`book-card  mb-4 ${isSelected ? 'selected' : ''}`}
+            role="card" // Aggiunto il ruolo "card" qui
+            className={`book-card mb-4 ${isSelected ? 'selected' : ''}`}
             onClick={handleClick}
             style={{
                 transition: 'all 0.3s ease',
                 border: isSelected ? '2px solid red' : '1px solid black', // Applica bordo rosso quando isSelected è true
             }}
+            data-testid={`book-card-${book.asin}`} 
         >
             <Card.Img
                 variant="top"

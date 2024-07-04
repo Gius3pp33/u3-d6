@@ -96,7 +96,7 @@ const CommentArea = ({ asin }) => {
 
     // Ritorna la lista dei commenti e il form per aggiungere nuovi commenti
     return (
-        <div className="comment-area">
+        <div className="comment-area" >
             <h3>Comments</h3>
             {comments.length === 0 && <Alert>Nessun commento disponibile.</Alert>}
             <CommentList comments={comments} onDelete={handleDeleteComment} />
