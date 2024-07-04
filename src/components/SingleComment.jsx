@@ -9,7 +9,7 @@ const SingleComment = ({ comment, onDelete }) => {
     };
 
     return (
-        <li className="list-group-item d-flex flex-column border border-secondary ">
+        <li data-testid="single-comment" className="list-group-item d-flex flex-column border border-secondary ">
             <div className="d-flex justify-content-between">
                 <strong>{comment.author}</strong>
                 <Button variant="danger" size="sm"  onClick={handleDeleteClick}> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash3" viewBox="0 0 16 16">
